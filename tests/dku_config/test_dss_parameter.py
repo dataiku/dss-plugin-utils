@@ -1,7 +1,9 @@
-import pytest
-from dkulib.dku_config.dss_parameter import DSSParameter, DSSParameterError
-from dkulib.dku_config.custom_check import CustomCheckError
 import logging
+
+import pytest
+
+from dkulib.dku_config.custom_check import CustomCheckError
+from dkulib.dku_config.dss_parameter import DSSParameter, DSSParameterError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -121,10 +123,10 @@ class TestDSSParameter:
                 value='foo',
                 cast_to=int
             )
-            error_message = str(err.value)
-            assert 'Error for parameter' in error_message
-            assert '<class \'int\'>' in error_message
-            assert '<class \'str\'>' in error_message
+        error_message = str(err.value)
+        assert 'error with parameter' in error_message
+        assert '<class \'int\'>' in error_message
+        assert '<class \'str\'>' in error_message
 
         with pytest.raises(DSSParameterError) as err:
             _ = DSSParameter(
@@ -132,9 +134,9 @@ class TestDSSParameter:
                 value=[1, 2, 3],
                 cast_to=float
             )
-            error_message = str(err.value)
-            assert '<class \'list\'>' in error_message
-            assert '<class \'float\'>' in error_message
+        error_message = str(err.value)
+        assert '<class \'list\'>' in error_message
+        assert '<class \'float\'>' in error_message
 
         dss_parameter_5 = DSSParameter(
             name='test_5',
@@ -151,8 +153,8 @@ class TestDSSParameter:
                 cast_to=str,
                 required=True
             )
-            error_message = str(err.value)
-            assert 'required' in error_message
+        error_message = str(err.value)
+        assert 'required' in error_message
 
         dss_parameter_7 = DSSParameter(
             name='test_5',
@@ -160,3 +162,29 @@ class TestDSSParameter:
             cast_to=int,
         )
         assert dss_parameter_7.value == None
+
+    def test_label(self, caplog):
+        with pytest.raises(DSSParameterError) as err:
+            _ = DSSParameter(
+                name='test_1',
+                value=7,
+                label='Display Name',
+                checks=[{
+                    "type": "is_type",
+                    "op": str
+                }]
+            )
+        error_message = str(err.value)
+        assert 'Display Name' in error_message
+
+        with pytest.raises(DSSParameterError) as err:
+            _ = DSSParameter(
+                name='test_1',
+                value=7,
+                checks=[{
+                    "type": "is_type",
+                    "op": str
+                }]
+            )
+        error_message = str(err.value)
+        assert 'test_1' in error_message
